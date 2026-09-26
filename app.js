@@ -2,10 +2,10 @@
 const KEY = 'glazeArc_v2';
 const ORDER = ['BODY','MONEY','HEALTH','PRODUCTIVITY'];
 const META = {
-  BODY:{emoji:'🏋️',dot:'#f43f5e',codes:['b','body']},
-  MONEY:{emoji:'💰',dot:'#818cf8',codes:['m','mon','money']},
-  HEALTH:{emoji:'🍏',dot:'#34d399',codes:['h','hlth','health']},
-  PRODUCTIVITY:{emoji:'⚡',dot:'#fbbf24',codes:['p','prod','productivity']}
+  BODY:{short:'BODY',dot:'#f43f5e',codes:['b','body']},
+  MONEY:{short:'MON',dot:'#818cf8',codes:['m','mon','money']},
+  HEALTH:{short:'HLTH',dot:'#34d399',codes:['h','hlth','health']},
+  PRODUCTIVITY:{short:'PROD',dot:'#fbbf24',codes:['p','prod','productivity']}
 };
 const MAX_PER = 2, ACC = '#8b7cf6';
 const $ = s => document.querySelector(s);
@@ -168,7 +168,7 @@ function renderDash(tasks){
   for(const p of ORDER){
     const t=tasks.find(x=>x.pillar===p);
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><strong>${META[p].emoji} ${p==='HEALTH'?'HLTH':p==='PRODUCTIVITY'?'PROD':p==='MONEY'?'MON':p}</strong></td>
+    tr.innerHTML=`<td><strong><span class="dot" style="background:${META[p].dot}"></span> ${META[p].short}</strong></td>
       <td>${t?esc(t.title):'—'}</td><td>${t?(isDone(t)?'[✔] Done':'[ ] Pending'):'[ ] Empty'}</td>`;
     tb.appendChild(tr);
   }
@@ -178,7 +178,7 @@ function renderCores(){
   for(const p of ORDER){
     const xp=S.xp[p]||0, lvl=Math.floor(xp/100)+1;
     const el=document.createElement('div'); el.className='core';
-    el.innerHTML=`<div class="core-top"><span>${META[p].emoji} ${p}</span><span>LV.${lvl} · ${xp} XP</span></div>
+    el.innerHTML=`<div class="core-top"><span><span class="dot" style="background:${META[p].dot}"></span> ${p}</span><span>LV.${lvl} · ${xp} XP</span></div>
       <div class="core-bar"><div style="width:${xp%100}%"></div></div>`;
     box.appendChild(el);
   }
