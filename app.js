@@ -273,3 +273,8 @@ function doSkip(){
 }
 
 bind(); render();
+
+// Median.co / standalone: offline service worker (https only)
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+}
