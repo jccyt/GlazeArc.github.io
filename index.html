@@ -3,253 +3,137 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>GLAZE ARC — Winter Arc Engine</title>
-<meta name="description" content="Glaze Arc. Outdo Mode engine. Money. Body. Health. Productivity." />
+<title>Outdo — Tasks</title>
+<meta name="description" content="Outdo Mode. Money. Body. Health. Productivity." />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="bg-grid" aria-hidden="true"></div>
-<div class="bg-glow" aria-hidden="true"></div>
+<div class="stage">
+  <div class="phone">
+    <div class="notch" aria-hidden="true"></div>
 
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-mark">◭</div>
-    <div>
-      <div class="brand-name">GLAZE ARC</div>
-      <div class="brand-sub">WINTER ARC PROTOCOL // V1.0</div>
-    </div>
-  </div>
-  <div class="streak-pill" id="streakPill" title="Overall streak">
-    <span class="streak-bolt">⚡︎</span>
-    <span class="streak-num" id="streakNum">0</span>
-    <span class="streak-label">DAY STREAK</span>
-  </div>
-  <nav class="topnav">
-    <button class="nav-btn" data-goto="dashboard" title="Dashboard [D]">DASH</button>
-    <button class="nav-btn" id="navNewBtn" title="New task [N]">+ NEW [N]</button>
-    <button class="nav-btn" data-goto="focus" title="Focus session [F]">FOCUS [F]</button>
-  </nav>
-</header>
+    <!-- TASKS VIEW (Bild-Layout) -->
+    <section class="view active" id="view-tasks">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons">··· 📶 🔋</span></div>
+      <div class="monthbar">
+        <button class="mnav" id="weekPrev">‹</button>
+        <h1 id="monthLabel">Mar</h1>
+        <button class="mnav" id="weekNext">›</button>
+      </div>
+      <div class="week" id="weekStrip"></div>
+      <div class="dayprogress">
+        <div class="dp-track"><div class="dp-fill" id="dayFill"></div></div>
+        <span id="dayPct">0%</span>
+      </div>
+      <div class="quicklog">
+        <input id="quickLog" type="text" placeholder='m1 b0 h1 p1 · +mon' autocomplete="off" />
+        <button class="fab" id="addBtn" title="New [N]">+</button>
+        <button class="iconbtn" id="filterBtn" title="Filter">⚙</button>
+      </div>
+      <div class="streakline" id="streakLine">⚡ STREAK: 0 Days</div>
+      <div class="taskscroll" id="taskScroll"></div>
+    </section>
 
-<main class="layout" id="dashboard">
-  <!-- HERO / COMMAND -->
-  <section class="hero panel">
-    <div class="hero-left">
-      <div class="kicker">NO COMFORT. NO EXCUSES. ONLY PROOF.</div>
-      <h1>KILL COMFORT.<br /><span class="frost">FREEZE YOUR FOCUS.</span></h1>
-      <p class="hero-desc">Track 4 pillars. Complete what matters. Overload. Repeat.</p>
-      <div class="hero-actions">
-        <button class="btn primary" id="checkinBtn">▣ LOG TODAY'S PROOF</button>
-        <button class="btn ghost" id="startSessionBtn">▶ START KILL SESSION [F]</button>
+    <!-- DASHBOARD VIEW (Skill Phase 2) -->
+    <section class="view" id="view-dash">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons">··· 📶 🔋</span></div>
+      <h2 class="vtitle">Dashboard</h2>
+      <h3 class="outdo-streak" id="dashStreak">⚡ STREAK: 0 Days</h3>
+      <div class="dashgrid">
+        <div class="dcard"><span class="dv" id="dToday">0%</span><span class="dk">TODAY</span></div>
+        <div class="dcard"><span class="dv" id="dDone">0</span><span class="dk">DONE</span></div>
+        <div class="dcard"><span class="dv" id="dBest">0</span><span class="dk">BEST</span></div>
       </div>
-      <div class="goldilocks-wrap">
-        <div class="goldilocks-head">
-          <span>GOLDILOCKS ZONE</span>
-          <span id="zoneLabel" class="zone-label">CALIBRATING…</span>
-        </div>
-        <div class="zone-meter">
-          <div class="zone-seg" data-zone="comfort">COMFORT</div>
-          <div class="zone-seg active" data-zone="goldilocks">GOLDILOCKS</div>
-          <div class="zone-seg" data-zone="panic">PANIC</div>
-        </div>
-        <div class="zone-hint" id="zoneHint">3–5 active kills = growth. Less is comfort. More is panic.</div>
-      </div>
-    </div>
-    <div class="hero-right">
-      <div class="stat-grid">
-        <div class="stat"><span class="stat-v" id="statToday">0%</span><span class="stat-k">TODAY EXECUTION</span></div>
-        <div class="stat"><span class="stat-v" id="statDone">0</span><span class="stat-k">KILLS LOGGED</span></div>
-        <div class="stat"><span class="stat-v" id="statBest">0</span><span class="stat-k">BEST STREAK</span></div>
-        <div class="stat"><span class="stat-v" id="statLevel">LV.1</span><span class="stat-k">ARC LEVEL</span></div>
-      </div>
-      <div class="xp-total">
-        <div class="xp-head"><span>TOTAL ARC POWER</span><span id="xpTotalLabel">0 XP</span></div>
-        <div class="xp-bar"><div class="xp-fill" id="xpTotalFill"></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- OUTDO MODE / MOBILE RAPID -->
-  <section class="panel outdo-panel">
-    <div class="panel-head">
-      <h2>00 // OUTDO MODE</h2>
-      <span class="panel-tag">MOBILE-FIRST // V1.1.0</span>
-    </div>
-    <p class="microcopy">Outdo Rule: not every box. Only the ones THAT MATTER. Max 2 kills per pillar.</p>
-    <div class="input-row">
-      <input id="quickLog" type="text" placeholder='Rapid log: "m1 b0 h1 p1" or "+money -body"' autocomplete="off" />
-      <button class="btn primary small" id="quickLogBtn">LOG →</button>
-    </div>
-    <h3 class="outdo-streak" id="outdoStreak">⚡ STREAK: 0 Days</h3>
-    <div class="outdo-table-wrap">
       <table class="outdo-table">
         <thead><tr><th>Pillar</th><th>Task</th><th>Status</th></tr></thead>
-        <tbody id="outdoBody"></tbody>
+        <tbody id="dashBody"></tbody>
       </table>
-    </div>
-    <div class="microcopy">Codes: <code>+mon +body +hlth +prod</code> done. <code>-mon</code> skip = friction.</div>
-    <div id="microStepBox" class="micro-step"></div>
-  </section>
+      <p class="hint">Codes: <code>+mon +body +hlth +prod</code></p>
+    </section>
 
-  <!-- CATEGORIES -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>01 // WAR FRONTS</h2>
-      <span class="panel-tag">4 PILLARS. ZERO MERCY.</span>
-    </div>
-    <div class="cat-grid" id="catGrid"></div>
-  </section>
+    <!-- CORES VIEW -->
+    <section class="view" id="view-cores">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons">··· 📶 🔋</span></div>
+      <h2 class="vtitle">Cores</h2>
+      <div id="coresList"></div>
+    </section>
 
-  <!-- MATRIX + TOP3 -->
-  <section class="split">
-    <div class="panel">
-      <div class="panel-head">
-        <h2>02 // CONSISTENCY MATRIX</h2>
-        <span class="panel-tag">MON–SUN // PAST 7 DAYS</span>
+    <!-- SETTINGS VIEW -->
+    <section class="view" id="view-settings">
+      <div class="statusbar"><span>9:41</span><span class="sb-icons">··· 📶 🔋</span></div>
+      <h2 class="vtitle">Settings</h2>
+      <p class="hint">Offline-first. LocalStorage only.</p>
+      <button class="btn full" id="resetDay">Reset selected day</button>
+      <button class="btn danger full" id="wipeAll">Wipe all data</button>
+      <div class="help">
+        <div><code>D</code> Tasks</div><div><code>N</code> New</div>
+        <div><code>1–4</code> Toggle pillar</div><div><code>Esc</code> Close</div>
       </div>
-      <div class="matrix-scroll">
-        <div class="matrix" id="matrix"></div>
-      </div>
-      <div class="matrix-legend"><span class="dot empty"></span> MISS <span class="dot part"></span> PARTIAL <span class="dot full"></span> DOMINATED</div>
-    </div>
+    </section>
 
-    <div class="panel kill-panel">
-      <div class="panel-head">
-        <h2>03 // TODAY'S 3 KILLS</h2>
-        <span class="panel-tag alert">ANTI-FAKE-PRODUCTIVITY</span>
-      </div>
-      <p class="microcopy">Algorithm filters filler. Only needle-movers survive below. Everything else is noise.</p>
-      <div id="top3List" class="top3"></div>
-      <div class="redirect-box">
-        <label for="focusInput">DAILY FOCUS DUMP — TYPE EVERYTHING, WE FILTER:</label>
-        <div class="input-row">
-          <input id="focusInput" type="text" placeholder="e.g. close $2k client, 100 pushups, ship landing page…" autocomplete="off" />
-          <button class="btn primary small" id="addTaskFromFocus">FILTER →</button>
+    <!-- BOTTOM NAV -->
+    <nav class="tabbar">
+      <button class="tab active" data-view="tasks"><span class="ti">▤</span><span>Tasks</span></button>
+      <button class="tab" data-view="dash"><span class="ti">▦</span><span>Dashboard</span></button>
+      <button class="tab" data-view="cores"><span class="ti">◇</span><span>Cores</span></button>
+      <button class="tab" data-view="settings"><span class="ti">⚙</span><span>Settings</span></button>
+    </nav>
+
+    <!-- NEW TASK SHEET -->
+    <div class="sheet-back" id="taskSheet" hidden>
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h3>New kill · max 2/pillar</h3>
+        <input id="ntTitle" type="text" placeholder="e.g. Marketing outreach" maxlength="50" />
+        <div class="row2">
+          <select id="ntPillar"><option value="BODY">🏋️ BODY</option><option value="MONEY">💰 MONEY</option><option value="HEALTH">🍏 HEALTH</option><option value="PRODUCTIVITY">⚡ PROD</option></select>
+          <select id="ntMode"><option value="toggle">Toggle</option><option value="count">Count</option><option value="percent">Percent</option></select>
         </div>
-        <div id="filterResult" class="filter-result"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TASKS + HABITS -->
-  <section class="split" id="tasksSection">
-    <div class="panel">
-      <div class="panel-head">
-        <h2>04 // KILL LIST</h2>
-        <div>
-          <button class="btn small" id="newTaskBtn">+ NEW [N]</button>
+        <div class="row2">
+          <input id="ntSub" type="text" placeholder="Sub: 4 hours" maxlength="30" />
+          <input id="ntTotal" type="number" min="1" max="99" value="4" title="Total (count)" />
         </div>
+        <button class="btn primary full" id="ntSave">COMMIT</button>
+        <button class="btn full" data-close>Cancel</button>
       </div>
-      <div class="task-filters">
-        <button class="chip active" data-filter="all">ALL</button>
-        <button class="chip" data-filter="active">ACTIVE</button>
-        <button class="chip" data-filter="done">DONE</button>
-      </div>
-      <div id="taskList" class="task-list"></div>
     </div>
 
-    <div class="panel" id="focus">
-      <div class="panel-head">
-        <h2>05 // OVERLOAD HABITS</h2>
-        <span class="panel-tag">PROGRESSIVE OVERLOAD ON</span>
-      </div>
-      <p class="microcopy">Complete 3 days in a row → system forces intensity up. Comfort is patched out.</p>
-      <form id="habitForm" class="habit-form">
-        <input id="habitName" type="text" placeholder="Habit e.g. Pushups" required maxlength="40" />
-        <select id="habitCat">
-          <option>MONEY</option><option>BODY</option><option>HEALTH</option><option>PRODUCTIVITY</option>
-        </select>
-        <input id="habitTarget" type="number" min="1" max="9999" value="20" title="Target" />
-        <input id="habitUnit" type="text" value="reps" maxlength="12" title="Unit" />
-        <button class="btn primary small" type="submit">ADD</button>
-      </form>
-      <div id="habitList" class="habit-list"></div>
-
-      <div class="session-box">
-        <div class="panel-head"><h2>06 // KILL SESSION</h2><span class="panel-tag" id="sessionState">IDLE</span></div>
-        <div class="timer" id="timerDisplay">25:00</div>
-        <div class="input-row">
-          <select id="sessionTask"></select>
-          <button class="btn primary small" id="sessionToggle">START</button>
-          <button class="btn ghost small" id="sessionExit">ABORT</button>
+    <!-- DETAIL SHEET -->
+    <div class="sheet-back" id="detailSheet" hidden>
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h3 id="dtTitle">Task</h3>
+        <p class="hint" id="dtSub"></p>
+        <div class="row2">
+          <button class="btn primary" id="dtDone">✓ Done</button>
+          <button class="btn" id="dtStep">→? Micro-step</button>
         </div>
-        <p class="microcopy">Abort or close tab mid-session = friction protocol. Your animal brain will be interrogated.</p>
+        <input id="dtMicro" type="text" placeholder="1 tiny move from your phone…" hidden />
+        <div class="row2">
+          <button class="btn" id="dtBack">−</button>
+          <button class="btn" id="dtFwd">+</button>
+        </div>
+        <button class="btn danger full" id="dtSkip">Skip (friction)</button>
+        <button class="btn full" data-close>Close</button>
       </div>
     </div>
-  </section>
 
-  <footer class="footer">
-    <span>GLAZE ARC © 2026 — BUILT FOR WINTER. OFFLINE-FIRST. LOCALSTORAGE ONLY.</span>
-    <span class="keys">KEYS: [D]ASH [N]EW [F]OCUS [O]UTDO [1-4]DONE [?]HELP [ESC]CLOSE</span>
-  </footer>
-</main>
-
-<!-- NEW TASK MODAL -->
-<div class="modal-backdrop" id="taskModal" hidden>
-  <div class="modal">
-    <div class="modal-head"><span>NEW KILL // NO FILLER</span><button class="x" data-close>✕</button></div>
-    <input id="newTaskTitle" type="text" placeholder="What moves the needle today?" maxlength="80" />
-    <div class="modal-row">
-      <select id="newTaskCat"><option>MONEY</option><option>BODY</option><option>HEALTH</option><option>PRODUCTIVITY</option></select>
-      <select id="newTaskImpact">
-        <option value="3">IMPACT: LOW (3)</option>
-        <option value="6" selected>IMPACT: MED (6)</option>
-        <option value="9">IMPACT: HIGH (9)</option>
-        <option value="10">IMPACT: LETHAL (10)</option>
-      </select>
+    <!-- FRICTION -->
+    <div class="friction" id="friction" hidden>
+      <div class="f-inner">
+        <div class="f-kicker">⚠ ANIMAL BRAIN ⚠</div>
+        <h2>QUIT?</h2>
+        <p id="fBody">No. Do 1 micro-step first.</p>
+        <div class="f-count" id="fCount">10</div>
+        <button class="hold" id="holdQuit">HOLD 3S TO QUIT</button>
+        <div class="hold-track"><div id="holdFill"></div></div>
+        <input id="weakInput" type="text" placeholder='Type I CHOOSE WEAKNESS' autocomplete="off" />
+        <button class="btn primary full" id="fightBack">⚡︎ STAY</button>
+      </div>
     </div>
-    <button class="btn primary full" id="createTaskBtn">COMMIT KILL</button>
-    <div class="modal-hint">Press ENTER to commit. ESC to retreat.</div>
+
   </div>
 </div>
-
-<!-- OVERLOAD MODAL -->
-<div class="modal-backdrop" id="overloadModal" hidden>
-  <div class="modal overload">
-    <div class="overload-kicker">▲ PROGRESSIVE OVERLOAD TRIGGERED</div>
-    <h3 id="overloadTitle">YOU ADAPTED. WE ESCALATE.</h3>
-    <p id="overloadDesc"></p>
-    <div class="overload-numbers"><span id="overloadOld"></span><span class="arrow">→</span><span id="overloadNew"></span></div>
-    <div class="modal-row">
-      <button class="btn primary" id="overloadAccept">ACCEPT ESCALATION</button>
-      <button class="btn ghost" id="overloadDecline">STAY WEAK</button>
-    </div>
-  </div>
-</div>
-
-<!-- FRICTION FULLSCREEN -->
-<div class="friction" id="frictionScreen" hidden>
-  <div class="friction-inner">
-    <div class="friction-kicker">⚠ ANIMAL BRAIN DETECTED ⚠</div>
-    <h2 id="frictionTitle">YOU ARE ABOUT<br />TO QUIT.</h2>
-    <p id="frictionBody">Comfort is lying to you. Nobody is coming to save you. 10 seconds. Decide who you are.</p>
-    <div class="friction-count" id="frictionCount">10</div>
-    <div class="hold-wrap">
-      <button class="hold-btn" id="holdToQuit">HOLD 3S TO CONFIRM WEAKNESS</button>
-      <div class="hold-bar"><div id="holdFill"></div></div>
-    </div>
-    <label class="type-confirm">OR TYPE <code>I CHOOSE WEAKNESS</code> TO SKIP:
-      <input id="weaknessInput" type="text" placeholder="type it…" autocomplete="off" />
-    </label>
-    <button class="btn primary big" id="fightBackBtn">⚡︎ FIGHT BACK — STAY IN THE ARC</button>
-    <div class="friction-quote" id="frictionQuote">“Discipline is choosing what you want most over what you want now.”</div>
-  </div>
-</div>
-
-<!-- HELP -->
-<div class="modal-backdrop" id="helpModal" hidden>
-  <div class="modal">
-    <div class="modal-head"><span>KEYBOARD // MOUSE IS SLOW</span><button class="x" data-close>✕</button></div>
-    <div class="help-grid">
-      <div><code>D</code> Dashboard</div><div><code>N</code> New kill</div>
-      <div><code>F</code> Focus session</div><div><code>1–4</code> Complete top tasks</div>
-      <div><code>O</code> Outdo rapid log</div><div><code>Esc</code> Close / fight back</div>
-    </div>
-  </div>
-</div>
-
-<div class="toast-stack" id="toasts"></div>
-
 <script src="app.js"></script>
 </body>
 </html>
