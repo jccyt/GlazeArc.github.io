@@ -1,6 +1,13 @@
-/* GLAZE ARC — Anti-lazy engine. Offline-first. Vanilla JS. */
+/* GLAZE ARC — Outdo Mode v1.1.0. Mobile-first. 4 pillars. Vanilla JS. */
 const KEY = 'glazeArc_v1';
-const CATS = ['MONEY','BODY','HEALTH','PRODUCTIVITY','MIND'];
+const CATS = ['MONEY','BODY','HEALTH','PRODUCTIVITY'];
+const PILLAR_META = {
+  MONEY:{emoji:'💰',short:'MON',codes:['m','mon','money']},
+  BODY:{emoji:'🏋️',short:'BODY',codes:['b','body']},
+  HEALTH:{emoji:'🍏',short:'HLTH',codes:['h','hlth','health']},
+  PRODUCTIVITY:{emoji:'⚡',short:'PROD',codes:['p','prod','productivity']}
+};
+const OUTDO_MAX_PER_CAT = 2;
 
 const FILLER_WORDS = ['email','inbox','clean','tidy','organize','organise','browse','scroll','netflix','meeting','laundry','dishes','watch','youtube','tiktok','instagram','news','chat','admin','file','sort'];
 const NEEDLE_WORDS = ['client','$','revenue','sales','close','deal','offer','ship','publish','launch','outreach','proposal','lift','run','pushup','pullup','squat','workout','gym','deep','code','build','write','read','meditat','cold','fast','protein','sleep','portfolio','interview','exam','study'];
@@ -38,7 +45,7 @@ function weekdayShort(d){ return ['SUN','MON','TUE','WED','THU','FRI','SAT'][d.g
 function defaultState(){
   return {
     streak:{current:0,longest:0,lastCheckIn:null},
-    xp:{MONEY:0,BODY:0,HEALTH:0,PRODUCTIVITY:0,MIND:0},
+    xp:{MONEY:0,BODY:0,HEALTH:0,PRODUCTIVITY:0},
     tasks:[],
     habits:[],
     logs:{}, // date -> {tasksDone:[ids], habitsDone:[ids]}
@@ -59,12 +66,16 @@ function load(){
       ];
       s.habits=[
         {id:uid(),name:'Pushups',cat:'BODY',target:20,unit:'reps',phase:1,completions:[],createdAt:Date.now()},
-        {id:uid(),name:'Read',cat:'MIND',target:10,unit:'pages',phase:1,completions:[],createdAt:Date.now()},
+        {id:uid(),name:'Read',cat:'PRODUCTIVITY',target:10,unit:'pages',phase:1,completions:[],createdAt:Date.now()},
         {id:uid(),name:'No sugar',cat:'HEALTH',target:1,unit:'day',phase:1,completions:[],createdAt:Date.now()}
       ];
       save(s); return s;
     }
     const s={...defaultState(),...JSON.parse(raw)};
+    // migrate legacy MIND pillar into PRODUCTIVITY (Outdo = 4 pillars)
+    if(s.xp && s.xp.MIND){ s.xp.PRODUCTIVITY=(s.xp.PRODUCTIVITY||0)+s.xp.MIND; delete s.xp.MIND; }
+    s.tasks=(s.tasks||[]).map(t=>({...t,cat:t.cat==='MIND'?'PRODUCTIVITY':t.cat}));
+    s.habits=(s.habits||[]).map(h=>({...h,cat:h.cat==='MIND'?'PRODUCTIVITY':h.cat}));
     return s;
   }catch{ return defaultState(); }
 }
@@ -148,7 +159,7 @@ function checkOverload(h){
 /* ---------- RENDER ---------- */
 let taskFilter='all';
 function render(){
-  renderStreak(); renderCats(); renderMatrix(); renderTasks(); renderTop3(); renderHabits(); renderSession(); renderZone();
+  renderStreak(); renderCats(); renderMatrix(); renderTasks(); renderTop3(); renderHabits(); renderSession(); renderZone(); renderOutdo();
 }
 function renderStreak(){
   $('#streakNum').textContent=S.streak.current;
@@ -293,6 +304,109 @@ function renderZone(){
   $('#zoneHint').textContent=`${active} open fronts. `+hint;
 }
 
+/* ---------- OUTDO MODE (skill v1.1.0) ---------- */
+function codeToCat(code){
+  code=code.toLowerCase();
+  for(const c of CATS) if(PILLAR_META[c].codes.includes(code)) return c;
+  return null;
+}
+function activeCountForCat(cat){
+  return S.tasks.filter(t=>!t.done&&t.cat===cat&&t.date===dayStr()).length;
+}
+function outdoRowFor(cat){
+  // top active task today in cat, else latest active, else habit, else empty
+  const today=dayStr();
+  let t=S.tasks.filter(x=>!x.done&&x.cat===cat&&(x.date===today)).sort((a,b)=>scoreTask(b)-scoreTask(a))[0]
+    || S.tasks.filter(x=>!x.done&&x.cat===cat).sort((a,b)=>scoreTask(b)-scoreTask(a))[0];
+  if(t) return {kind:'task',ref:t,title:t.title,done:false,id:t.id};
+  const h=S.habits.find(x=>x.cat===cat);
+  if(h){
+    const done=h.completions.includes(today);
+    return {kind:'habit',ref:h,title:`${h.name} — ${h.target} ${h.unit}`,done,id:h.id};
+  }
+  return {kind:'none',title:'— no kill set',done:false,id:null};
+}
+function renderOutdo(){
+  const s=$('#outdoStreak'); if(s) s.textContent=`⚡ STREAK: ${S.streak.current} Days`;
+  const body=$('#outdoBody'); if(!body) return;
+  body.innerHTML='';
+  for(const c of CATS){
+    const m=PILLAR_META[c]; const row=outdoRowFor(c);
+    const tr=document.createElement('tr');
+    const status=row.done?'<span class="outdo-done">[✔] Done</span>':row.kind==='none'?'<span class="outdo-pend">[ ] Empty</span>':'<span class="outdo-pend">[ ] Pending</span>';
+    tr.innerHTML=`<td><strong>${m.emoji} ${m.short}</strong></td><td>${escapeHtml(row.title.slice(0,60))}${!row.done&&row.kind!=='none'?`<button class="outdo-act" data-micro="${row.id}" data-kind="${row.kind}">→?</button>`:''}</td><td>${status} ${!row.done&&row.kind!=='none'?`<button class="outdo-act" data-d="${row.id}" data-k="${row.kind}">✓</button>`:''}</td>`;
+    body.appendChild(tr);
+  }
+  body.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{
+    if(b.dataset.k==='habit') completeHabit(b.dataset.d);
+    else completeTask(b.dataset.d);
+  });
+  body.querySelectorAll('[data-micro]').forEach(b=>b.onclick=()=>askMicroStep(b.dataset.kind,b.dataset.micro));
+}
+function askMicroStep(kind,id){
+  const box=$('#microStepBox');
+  const item = kind==='habit'? S.habits.find(h=>h.id===id) : S.tasks.find(t=>t.id===id);
+  if(!item) return;
+  const name=item.title||item.name;
+  box.innerHTML=`<strong>NEXT MICRO-STEP → "${escapeHtml(String(name).slice(0,50))}":</strong><br><span style="color:var(--mut)">1 tiny move you can do from your phone right now?</span><div class="input-row" style="margin-top:6px"><input id="microInput" placeholder="e.g. open gym bag, text 1 client…" /><button class="btn primary small" id="microSave">SET</button></div>`;
+  $('#microSave').onclick=()=>{
+    const v=$('#microInput').value.trim(); if(!v) return;
+    item.next=v; save(S); render();
+    toast('Friction cut. Do that micro-step now.');
+  };
+  $('#microInput').focus();
+}
+// shorthand: "m1 b0 h1 p1" | "+money -body" | "+mon"
+function parseQuickLog(raw){
+  const actions=[]; // {cat, done:boolean}
+  const parts=raw.toLowerCase().split(/[\s,;]+/).filter(Boolean);
+  for(const p of parts){
+    let m=p.match(/^([mbhp])([01])$/); // m1 b0
+    if(m){ actions.push({cat:codeToCat({m:'MONEY',b:'BODY',h:'HEALTH',p:'PRODUCTIVITY'}[m[1]]),done:m[2]==='1'}); continue; }
+    m=p.match(/^([+-])([a-z]+)$/); // +money -body +mon
+    if(m){ const c=codeToCat(m[2]); if(c) actions.push({cat:c,done:m[1]==='+'}); continue; }
+    const c=codeToCat(p); if(c) actions.push({cat:c,done:true});
+  }
+  return actions;
+}
+function applyQuickLog(){
+  const el=$('#quickLog'); const raw=el.value.trim();
+  if(!raw){ toast('Type: m1 b0 h1 p1'); return; }
+  const actions=parseQuickLog(raw);
+  if(!actions.length){ toast('No code. Try +mon / m1 b0'); return; }
+  let done=0, blocked=0;
+  for(const a of actions){
+    // find today's top active task in cat
+    const cand=S.tasks.filter(t=>!t.done&&t.cat===a.cat).sort((x,y)=>scoreTask(y)-scoreTask(x))[0];
+    if(a.done){
+      if(cand){ completeTaskSilent(cand.id); done++; }
+      else {
+        if(activeCountForCat(a.cat)>=OUTDO_MAX_PER_CAT){ blocked++; continue; }
+        S.tasks.push({id:uid(),title:`Outdo proof — ${a.cat}`,cat:a.cat,impact:7,done:true,createdAt:Date.now(),date:dayStr()});
+        const nt=S.tasks[S.tasks.length-1];
+        S.xp[a.cat]=(S.xp[a.cat]||0)+14; logDone(dayStr(),'task',nt.id); done++;
+      }
+    } else {
+      if(cand) requestSkip('task',cand.id);
+      else done++;
+    }
+  }
+  touchStreak(); save(S); el.value=''; render();
+  toast(blocked?`${done} logged. ${blocked} blocked: max 2/pillar.`:`${done} logged. Only what matters.`);
+}
+function completeTaskSilent(id){
+  const t=S.tasks.find(x=>x.id===id); if(!t||t.done) return;
+  t.done=true; S.xp[t.cat]=(S.xp[t.cat]||0)+Number(t.impact||5)*2;
+  logDone(dayStr(),'task',id);
+}
+function enforceMaxPerCat(cat){
+  if(activeCountForCat(cat)>=OUTDO_MAX_PER_CAT){
+    toast(`${cat}: max ${OUTDO_MAX_PER_CAT}. Finish one first.`);
+    return false;
+  }
+  return true;
+}
+
 /* ---------- ACTIONS ---------- */
 function completeTask(id){
   const t=S.tasks.find(x=>x.id===id); if(!t||t.done) return;
@@ -430,6 +544,8 @@ function bind(){
   };
   $('#addTaskFromFocus').onclick=addFromFocus;
   $('#focusInput').onkeydown=(e)=>{ if(e.key==='Enter') addFromFocus(); };
+  $('#quickLogBtn').onclick=applyQuickLog;
+  $('#quickLog').onkeydown=(e)=>{ if(e.key==='Enter') applyQuickLog(); };
   $$('.chip').forEach(c=>c.onclick=()=>{ $$('.chip').forEach(x=>x.classList.remove('active')); c.classList.add('active'); taskFilter=c.dataset.filter; renderTasks(); });
   $$('[data-close]').forEach(b=>b.onclick=closeModals);
   $$('.modal-backdrop').forEach(m=>m.addEventListener('click',(e)=>{ if(e.target===m) closeModals(); }));
@@ -454,8 +570,9 @@ function bind(){
     if(k==='d'){ document.getElementById('dashboard').scrollIntoView({behavior:'smooth'}); }
     if(k==='n'){ openNew(); }
     if(k==='f'){ startSession(); }
+    if(k==='o'){ document.querySelector('.outdo-panel')?.scrollIntoView({behavior:'smooth'}); }
     if(k==='?'){ openModal('#helpModal'); }
-    if(['1','2','3','4','5'].includes(k)){
+    if(['1','2','3','4'].includes(k)){
       const t=top3()[Number(k)-1]; if(t) completeTask(t.id);
     }
   });
@@ -470,7 +587,9 @@ function bind(){
 function openNew(){ openModal('#taskModal'); setTimeout(()=>$('#newTaskTitle').focus(),50); }
 function createTask(){
   const title=$('#newTaskTitle').value.trim(); if(!title){ toast('Name the kill first.'); return; }
-  S.tasks.push({id:uid(),title,cat:$('#newTaskCat').value,impact:Number($('#newTaskImpact').value)||6,done:false,createdAt:Date.now(),date:dayStr()});
+  const cat=$('#newTaskCat').value;
+  if(!enforceMaxPerCat(cat)) return;
+  S.tasks.push({id:uid(),title,cat,impact:Number($('#newTaskImpact').value)||6,done:false,createdAt:Date.now(),date:dayStr()});
   $('#newTaskTitle').value=''; closeModals(); save(S); render();
   const sc=scoreTask(S.tasks[S.tasks.length-1]);
   toast(sc<5?'FILTERED AS FILLER — do it only after top 3.':`KILL ADDED. SCORE ${sc.toFixed(1)}. TOP 3 UPDATED.`);
@@ -483,7 +602,9 @@ function addFromFocus(){
   for(const p of parts){
     const probe={title:p,impact:6};
     if(scoreTask(probe)<4 && parts.length>1) continue; // filter filler when bulk dump
-    S.tasks.push({id:uid(),title:p[0].toUpperCase()+p.slice(1),cat:guessCat(p),impact:Math.round(scoreTask(probe)),done:false,createdAt:Date.now(),date:dayStr()});
+    const cat=guessCat(p);
+    if(activeCountForCat(cat)>=OUTDO_MAX_PER_CAT) continue; // Outdo rule: max 2
+    S.tasks.push({id:uid(),title:p[0].toUpperCase()+p.slice(1),cat,impact:Math.round(scoreTask(probe)),done:false,createdAt:Date.now(),date:dayStr()});
     added++;
   }
   $('#focusInput').value='';
@@ -497,8 +618,7 @@ function guessCat(t){
   if(/\$|client|revenue|sales|money|deal|offer/.test(l)) return 'MONEY';
   if(/lift|run|push|gym|workout|protein|walk/.test(l)) return 'BODY';
   if(/sleep|sugar|fast|cold|water|health|doctor/.test(l)) return 'HEALTH';
-  if(/deep|code|ship|study|exam|build|write/.test(l)) return 'PRODUCTIVITY';
-  if(/read|meditat|journal|mind|focus/.test(l)) return 'MIND';
+  if(/deep|code|ship|study|exam|build|write|read|meditat|journal|mind|focus/.test(l)) return 'PRODUCTIVITY';
   return 'PRODUCTIVITY';
 }
 

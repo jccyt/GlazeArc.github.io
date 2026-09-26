@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>GLAZE ARC — Winter Arc Engine</title>
-<meta name="description" content="Glaze Arc. Anti-lazy habit and progress tracking engine. Money. Body. Health. Productivity. Mind." />
+<meta name="description" content="Glaze Arc. Outdo Mode engine. Money. Body. Health. Productivity." />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -37,7 +37,7 @@
     <div class="hero-left">
       <div class="kicker">NO COMFORT. NO EXCUSES. ONLY PROOF.</div>
       <h1>KILL COMFORT.<br /><span class="frost">FREEZE YOUR FOCUS.</span></h1>
-      <p class="hero-desc">Track 5 war fronts. Complete. Overload. Repeat. Miss a day and the ice cracks.</p>
+      <p class="hero-desc">Track 4 pillars. Complete what matters. Overload. Repeat.</p>
       <div class="hero-actions">
         <button class="btn primary" id="checkinBtn">▣ LOG TODAY'S PROOF</button>
         <button class="btn ghost" id="startSessionBtn">▶ START KILL SESSION [F]</button>
@@ -69,11 +69,33 @@
     </div>
   </section>
 
+  <!-- OUTDO MODE / MOBILE RAPID -->
+  <section class="panel outdo-panel">
+    <div class="panel-head">
+      <h2>00 // OUTDO MODE</h2>
+      <span class="panel-tag">MOBILE-FIRST // V1.1.0</span>
+    </div>
+    <p class="microcopy">Outdo Rule: not every box. Only the ones THAT MATTER. Max 2 kills per pillar.</p>
+    <div class="input-row">
+      <input id="quickLog" type="text" placeholder='Rapid log: "m1 b0 h1 p1" or "+money -body"' autocomplete="off" />
+      <button class="btn primary small" id="quickLogBtn">LOG →</button>
+    </div>
+    <h3 class="outdo-streak" id="outdoStreak">⚡ STREAK: 0 Days</h3>
+    <div class="outdo-table-wrap">
+      <table class="outdo-table">
+        <thead><tr><th>Pillar</th><th>Task</th><th>Status</th></tr></thead>
+        <tbody id="outdoBody"></tbody>
+      </table>
+    </div>
+    <div class="microcopy">Codes: <code>+mon +body +hlth +prod</code> done. <code>-mon</code> skip = friction.</div>
+    <div id="microStepBox" class="micro-step"></div>
+  </section>
+
   <!-- CATEGORIES -->
   <section class="panel">
     <div class="panel-head">
       <h2>01 // WAR FRONTS</h2>
-      <span class="panel-tag">5 CATEGORIES. ZERO MERCY.</span>
+      <span class="panel-tag">4 PILLARS. ZERO MERCY.</span>
     </div>
     <div class="cat-grid" id="catGrid"></div>
   </section>
@@ -135,7 +157,7 @@
       <form id="habitForm" class="habit-form">
         <input id="habitName" type="text" placeholder="Habit e.g. Pushups" required maxlength="40" />
         <select id="habitCat">
-          <option>MONEY</option><option>BODY</option><option>HEALTH</option><option>PRODUCTIVITY</option><option>MIND</option>
+          <option>MONEY</option><option>BODY</option><option>HEALTH</option><option>PRODUCTIVITY</option>
         </select>
         <input id="habitTarget" type="number" min="1" max="9999" value="20" title="Target" />
         <input id="habitUnit" type="text" value="reps" maxlength="12" title="Unit" />
@@ -158,7 +180,7 @@
 
   <footer class="footer">
     <span>GLAZE ARC © 2026 — BUILT FOR WINTER. OFFLINE-FIRST. LOCALSTORAGE ONLY.</span>
-    <span class="keys">KEYS: [D]ASH [N]EW [F]OCUS [1-5]DONE [?]HELP [ESC]CLOSE</span>
+    <span class="keys">KEYS: [D]ASH [N]EW [F]OCUS [O]UTDO [1-4]DONE [?]HELP [ESC]CLOSE</span>
   </footer>
 </main>
 
@@ -168,7 +190,7 @@
     <div class="modal-head"><span>NEW KILL // NO FILLER</span><button class="x" data-close>✕</button></div>
     <input id="newTaskTitle" type="text" placeholder="What moves the needle today?" maxlength="80" />
     <div class="modal-row">
-      <select id="newTaskCat"><option>MONEY</option><option>BODY</option><option>HEALTH</option><option>PRODUCTIVITY</option><option>MIND</option></select>
+      <select id="newTaskCat"><option>MONEY</option><option>BODY</option><option>HEALTH</option><option>PRODUCTIVITY</option></select>
       <select id="newTaskImpact">
         <option value="3">IMPACT: LOW (3)</option>
         <option value="6" selected>IMPACT: MED (6)</option>
@@ -220,8 +242,8 @@
     <div class="modal-head"><span>KEYBOARD // MOUSE IS SLOW</span><button class="x" data-close>✕</button></div>
     <div class="help-grid">
       <div><code>D</code> Dashboard</div><div><code>N</code> New kill</div>
-      <div><code>F</code> Focus session</div><div><code>1–5</code> Complete top tasks</div>
-      <div><code>Enter</code> Commit modal</div><div><code>Esc</code> Close / fight back</div>
+      <div><code>F</code> Focus session</div><div><code>1–4</code> Complete top tasks</div>
+      <div><code>O</code> Outdo rapid log</div><div><code>Esc</code> Close / fight back</div>
     </div>
   </div>
 </div>

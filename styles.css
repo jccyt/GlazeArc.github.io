@@ -71,7 +71,7 @@ body{min-height:100vh;overflow-x:hidden}
 .zone-hint{font-size:12px;color:var(--mut);margin-top:8px}
 
 /* CATS */
-.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .cat{background:#080e18;border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}
 .cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .cat-name{font-family:var(--mono);font-size:11px;letter-spacing:.18em;font-weight:800}
@@ -81,6 +81,21 @@ body{min-height:100vh;overflow-x:hidden}
 .cat-fill{height:100%;background:linear-gradient(90deg,var(--deep),var(--frost));width:0%}
 .cat-sub{font-size:11px;color:var(--mut)}
 .cat-btn{width:100%;margin-top:8px;padding:8px;font-size:10px}
+
+/* OUTDO MODE — mobile-first, narrow, no horizontal scroll */
+.outdo-panel{border-color:var(--line2)}
+.outdo-streak{margin:12px 0 8px;font-family:var(--mono);font-size:15px;letter-spacing:.12em;color:var(--glaze)}
+.outdo-table-wrap{overflow-x:hidden}
+.outdo-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.outdo-table th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mut);text-align:left;padding:6px;border-bottom:1px solid var(--line)}
+.outdo-table td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top;word-wrap:break-word}
+.outdo-table td:first-child{white-space:nowrap;font-weight:800;font-size:12px;width:74px}
+.outdo-done{color:var(--win);font-family:var(--mono);font-size:12px}
+.outdo-pend{color:var(--gold);font-family:var(--mono);font-size:12px}
+.outdo-act{font-family:var(--mono);font-size:11px;margin-left:6px;background:transparent;border:1px solid var(--line2);color:var(--frost);padding:3px 6px;cursor:pointer}
+.micro-step{margin-top:10px;font-size:13px;color:var(--glaze)}
+.micro-step input{margin-top:6px}
+.microcopy code{background:#080e18;border:1px solid var(--line);padding:1px 5px;color:var(--frost);font-size:11px}
 
 /* SPLIT */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
